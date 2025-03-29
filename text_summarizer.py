@@ -2,7 +2,7 @@ from transformers import pipeline, T5Tokenizer
 
 def summarize_text(text, max_length=130, min_length=30, model_name='t5-small'):
     """
-    Summarizes long texts using a pre-trained model from Hugging Face's Transformers. 
+    Summarizes long texts using a pre-trained model from Hugging Face's Transformers models. 
     This enhanced version includes functionality to handle large texts by breaking them 
     into manageable chunks, addressing the token limit constraint of the model.
     
