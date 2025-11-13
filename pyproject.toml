@@ -10,14 +10,13 @@ readme = "README.md"
 authors = [
     {name = "Python Enthusiasts"}
 ]
-license = {text = "MIT"}
+license = "MIT"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Text Processing :: Linguistic",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -56,6 +55,12 @@ ai-text-summarizer = "ai_text_summarizer.cli:main"
 Homepage = "https://github.com/pyenthusiasts/AI-Text-Summarizer"
 "Bug Reports" = "https://github.com/pyenthusiasts/AI-Text-Summarizer/issues"
 Source = "https://github.com/pyenthusiasts/AI-Text-Summarizer"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.black]
 line-length = 100
