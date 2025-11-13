@@ -1,142 +1,307 @@
-# Text Summarization using Hugging Face Transformers
+# AI Text Summarizer
 
-## Overview
+[![CI](https://github.com/pyenthusiasts/AI-Text-Summarizer/workflows/CI/badge.svg)](https://github.com/pyenthusiasts/AI-Text-Summarizer/actions)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-This Python script provides a simple and effective way to summarize long texts using a pre-trained model from Hugging Face's Transformers library. It includes enhanced functionality to handle large texts by automatically breaking them into manageable chunks, addressing the token limit constraint of the model.
+A professional Python package for text summarization using state-of-the-art pre-trained models from Hugging Face Transformers. Supports multiple models, handles long texts automatically, and provides both Python API and command-line interface.
 
-## Requirements
+## Features
 
-- Python 3.6 or higher
-- `transformers` library from Hugging Face
+- **Multiple Model Support**: T5, BART, Pegasus, and more
+- **Automatic Text Chunking**: Handles texts of any length by intelligently splitting into chunks
+- **Smart Token-Based Splitting**: Proper token-aware chunking with configurable overlap
+- **Batch Processing**: Summarize multiple texts efficiently
+- **CLI Interface**: Easy-to-use command-line tool
+- **Python API**: Clean, intuitive API for programmatic use
+- **GPU Acceleration**: Automatic CUDA detection and utilization
+- **Type Hints**: Full type annotation for better IDE support
+- **Comprehensive Testing**: Extensive test suite with high coverage
+- **Configurable**: Flexible configuration for all parameters
 
-To install the `transformers` library, use pip:
+## Installation
+
+### From Source
 
 ```bash
-pip install transformers
+# Clone the repository
+git clone https://github.com/pyenthusiasts/AI-Text-Summarizer.git
+cd AI-Text-Summarizer
+
+# Install the package
+pip install -e .
+
+# Or install with development dependencies
+pip install -e ".[dev]"
 ```
 
-## Functionality
+### Requirements
 
-The script includes a function `summarize_text` that takes a long piece of text and summarizes it using a specified pre-trained model. If the text exceeds the model's token limit, the function automatically breaks the text into smaller chunks and summarizes each chunk separately.
+- Python 3.8 or higher
+- PyTorch 2.0+
+- Transformers 4.30+
 
-### Parameters
+## Quick Start
 
-- **`text`**: The input text to be summarized.
-- **`max_length`**: The maximum length of the summary. Default is `130` words.
-- **`min_length`**: The minimum length of the summary. Default is `30` words.
-- **`model_name`**: The pre-trained model to be used for summarization. Defaults to `'t5-small'`. This can be changed to other models, such as `'facebook/bart-large-cnn'`, for potentially better results.
+### Python API
 
-### Returns
+```python
+from ai_text_summarizer import summarize_text
 
-- A string containing the summarized version of the input text.
+# Simple usage with default settings
+text = """
+Artificial Intelligence (AI) is intelligence demonstrated by machines, as opposed to
+natural intelligence displayed by animals including humans. Leading AI textbooks define
+the field as the study of intelligent agents: any system that perceives its environment
+and takes actions that maximize its chance of achieving its goals.
+"""
+
+summary = summarize_text(text)
+print(summary)
+```
+
+### Advanced Usage
+
+```python
+from ai_text_summarizer import TextSummarizer, SummarizerConfig
+
+# Custom configuration
+config = SummarizerConfig(
+    model_name="facebook/bart-large-cnn",
+    max_length=150,
+    min_length=50,
+    chunk_overlap=30
+)
+
+# Create summarizer instance
+summarizer = TextSummarizer(config=config, verbose=True)
+
+# Summarize single text
+summary = summarizer.summarize(text)
+
+# Batch summarize multiple texts
+texts = ["Text 1...", "Text 2...", "Text 3..."]
+summaries = summarizer.batch_summarize(texts)
+```
+
+### Command-Line Interface
+
+```bash
+# Summarize from stdin
+echo "Your long text here..." | ai-text-summarizer
+
+# Summarize a file
+ai-text-summarizer -i input.txt -o summary.txt
+
+# Use a different model
+ai-text-summarizer -i input.txt --model facebook/bart-large-cnn
+
+# Customize summary length
+ai-text-summarizer -i input.txt --max-length 200 --min-length 50
+
+# Enable verbose output
+ai-text-summarizer -i input.txt -v
+
+# List supported models
+ai-text-summarizer --list-models
+
+# Get help
+ai-text-summarizer --help
+```
+
+## Supported Models
+
+| Model | Type | Max Tokens | Best For |
+|-------|------|------------|----------|
+| `t5-small` | T5 | 512 | Fast, general purpose (default) |
+| `t5-base` | T5 | 512 | Better quality, still fast |
+| `t5-large` | T5 | 512 | High quality, slower |
+| `facebook/bart-large-cnn` | BART | 1024 | News articles, longer texts |
+| `google/pegasus-xsum` | Pegasus | 512 | Extreme summarization |
+| `google/pegasus-cnn_dailymail` | Pegasus | 1024 | News, balanced summaries |
+
+## Configuration Options
+
+### SummarizerConfig Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model_name` | str | "t5-small" | Pre-trained model to use |
+| `max_length` | int | 130 | Maximum summary length in tokens |
+| `min_length` | int | 30 | Minimum summary length in tokens |
+| `max_chunk_size` | int | None | Max chunk size (auto-detected if None) |
+| `chunk_overlap` | int | 50 | Token overlap between chunks |
+| `do_sample` | bool | False | Use sampling for generation |
+| `temperature` | float | 1.0 | Sampling temperature |
+| `device` | str | None | Device to use ('cpu', 'cuda', or None for auto) |
 
 ## How It Works
 
-1. **Initialization**: The function initializes the tokenizer and summarization pipeline using the specified model (`T5Tokenizer` and `pipeline` from the `transformers` library).
-2. **Token Limit Check**: The input text is tokenized to check if it exceeds the model's maximum token limit.
-3. **Text Chunking**: If the text exceeds the token limit, it is broken down into smaller chunks that fit within the model's capacity. Each chunk is processed separately.
-4. **Summarization**: Each chunk is summarized individually, and the resulting summaries are concatenated to form the final summarized output.
-5. **Direct Summarization**: If the text is within the token limit, it is directly summarized without the need for chunking.
+1. **Initialization**: Loads the specified pre-trained model and tokenizer
+2. **Token Counting**: Tokenizes input text to determine length
+3. **Smart Chunking**: If text exceeds model limits, splits into overlapping chunks
+4. **Summarization**: Generates summaries for each chunk
+5. **Combination**: Merges chunk summaries into final output
+6. **Recursive Processing**: Re-summarizes if combined result is still too long
 
-## Example Usage
+### Key Improvements Over Basic Implementation
 
-Here's an example of how to use the `summarize_text` function:
+- **Token-Based Chunking**: Uses actual tokens instead of characters for accurate splitting
+- **Error Handling**: Comprehensive error checking and validation
+- **Logging**: Detailed logging for debugging and monitoring
+- **Type Safety**: Full type hints throughout
+- **Configurability**: All parameters exposed for customization
+- **Batch Processing**: Efficient handling of multiple texts
+- **Device Management**: Automatic GPU detection and usage
 
-```python
-from transformers import pipeline, T5Tokenizer
+## Examples
 
-def summarize_text(text, max_length=130, min_length=30, model_name='t5-small'):
-    """
-    Summarizes long texts using a pre-trained model from Hugging Face's Transformers. 
-    This enhanced version includes functionality to handle large texts by breaking them 
-    into manageable chunks, addressing the token limit constraint of the model.
-    
-    Parameters:
-    - text: The text to be summarized.
-    - max_length: The maximum length of the summary (default: 130 words).
-    - min_length: The minimum length of the summary (default: 30 words).
-    - model_name: The model to be used for summarization. Defaults to 't5-small', 
-                  but can be changed to other models like 'facebook/bart-large-cnn' 
-                  for potentially better results.
-    
-    Returns:
-    - A string containing the summarized text.
-    
-    Example usage:
-    summary = summarize_text("Your long article or text here...")
-    print(summary)
-    """
-    # Initialize tokenizer and summarizer pipeline with the specified model
-    tokenizer = T5Tokenizer.from_pretrained(model_name)
-    summarizer = pipeline("summarization", model=model_name)
-    
-    # Check if the text exceeds the model's maximum token limit
-    tokens = tokenizer.tokenize(text)
-    max_tokens = tokenizer.model_max_length
-    
-    if len(tokens) > max_tokens:
-        # Break the text into chunks
-        chunk_size = max_tokens - 50  # Adjusted for context overlap
-        text_chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
-        
-        summaries = []
-        for chunk in text_chunks:
-            summary = summarizer(chunk, max_length=max_length, min_length=min_length, do_sample=False)
-            summaries.append(summary[0]['summary_text'])
-        # Combine summaries of each chunk
-        return ' '.join(summaries)
-    else:
-        # Directly summarize if within token limit
-        summary = summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)
-        return summary[0]['summary_text']
+See the [examples/](examples/) directory for detailed examples:
 
-# Example usage
-if __name__ == "__main__":
-    # Example long text input
-    text = "Your long article or text here..."
-    summary = summarize_text(text)
-    print("Summary:")
-    print(summary)
+- [`basic_usage.py`](examples/basic_usage.py) - Simple usage with default settings
+- [`advanced_usage.py`](examples/advanced_usage.py) - Custom configuration and features
+- [`file_processing.py`](examples/file_processing.py) - Reading and writing files
+
+Run an example:
+```bash
+cd examples
+python basic_usage.py
 ```
 
-### Running the Script
+## Development
 
-To run the script, simply copy and paste it into a Python file (e.g., `summarize.py`) and execute it from the command line:
+### Setup Development Environment
 
 ```bash
-python summarize.py
+# Clone and install with dev dependencies
+git clone https://github.com/pyenthusiasts/AI-Text-Summarizer.git
+cd AI-Text-Summarizer
+pip install -e ".[dev]"
 ```
 
-### Example Output
+### Running Tests
 
-For an input text like:
+```bash
+# Run all tests
+make test
 
-```
-text = "Artificial Intelligence (AI) is a rapidly growing field of technology..."
-```
-
-The output might look like:
-
-```
-Summary:
-AI is an expanding field focused on creating machines capable of performing tasks that typically require human intelligence...
+# Run with coverage report
+pytest --cov=src/ai_text_summarizer --cov-report=html
 ```
 
-## Customizing the Model
+### Code Quality
 
-You can change the model used for summarization by specifying a different `model_name`:
+```bash
+# Format code
+make format
 
-```python
-summary = summarize_text("Your text here...", model_name='facebook/bart-large-cnn')
+# Run linting
+make lint
+
+# Run all checks
+make format lint test
 ```
 
-Different models may provide varying levels of performance and summary quality depending on the context and length of the input text.
+### Project Structure
 
-## Note
+```
+AI-Text-Summarizer/
+├── src/ai_text_summarizer/    # Main package
+│   ├── __init__.py             # Package initialization
+│   ├── summarizer.py           # Core summarization logic
+│   ├── config.py               # Configuration classes
+│   ├── utils.py                # Utility functions
+│   └── cli.py                  # Command-line interface
+├── tests/                      # Test suite
+│   ├── test_summarizer.py
+│   ├── test_config.py
+│   └── test_utils.py
+├── examples/                   # Example scripts
+├── .github/workflows/          # CI/CD configuration
+├── requirements.txt            # Runtime dependencies
+├── requirements-dev.txt        # Development dependencies
+├── setup.py                    # Package setup
+├── pyproject.toml             # Build configuration
+└── README.md                  # This file
+```
 
-- The function uses the `T5Tokenizer` and Hugging Face's pipeline for summarization.
-- Make sure that you have sufficient computational resources, as running large models may require a GPU and significant memory.
+## Contributing
 
-## Conclusion
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-This script offers a flexible and efficient way to summarize long texts using state-of-the-art models from Hugging Face's Transformers library. The ability to handle large texts by breaking them into manageable chunks makes it robust and versatile for various applications, including summarizing articles, reports, or any lengthy documents.
+### Quick Contribution Guide
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests and linting (`make test lint`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## Testing
+
+The project includes a comprehensive test suite:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src/ai_text_summarizer
+
+# Run specific test file
+pytest tests/test_summarizer.py
+
+# Run with verbose output
+pytest -v
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
+
+## Acknowledgments
+
+- Built with [Hugging Face Transformers](https://huggingface.co/transformers/)
+- Powered by [PyTorch](https://pytorch.org/)
+- Supports models from [Hugging Face Model Hub](https://huggingface.co/models)
+
+## Citation
+
+If you use this project in your research or work, please cite:
+
+```bibtex
+@software{ai_text_summarizer,
+  title = {AI Text Summarizer},
+  author = {Python Enthusiasts},
+  year = {2024},
+  url = {https://github.com/pyenthusiasts/AI-Text-Summarizer}
+}
+```
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/pyenthusiasts/AI-Text-Summarizer/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/pyenthusiasts/AI-Text-Summarizer/discussions)
+- **Documentation**: See [examples/](examples/) and inline documentation
+
+## Roadmap
+
+- [ ] Web interface for easy usage
+- [ ] REST API server
+- [ ] Additional model support
+- [ ] Multi-language support
+- [ ] Model fine-tuning scripts
+- [ ] Docker containerization
+- [ ] Performance benchmarks
+- [ ] Caching mechanisms
+
+---
+
+Made with ❤️ by Python Enthusiasts
