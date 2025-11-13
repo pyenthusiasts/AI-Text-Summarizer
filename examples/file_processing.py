@@ -10,7 +10,7 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ai_text_summarizer import TextSummarizer, SummarizerConfig
+from ai_text_summarizer import SummarizerConfig, TextSummarizer  # noqa: E402
 
 
 def summarize_file(input_path: str, output_path: str, verbose: bool = False):

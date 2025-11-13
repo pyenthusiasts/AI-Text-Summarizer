@@ -3,18 +3,18 @@ Main text summarization module using Hugging Face Transformers.
 """
 
 import logging
-from typing import Optional, Union, List
 import warnings
+from typing import List, Optional
 
-from transformers import pipeline, AutoTokenizer
+from transformers import AutoTokenizer, pipeline
 from transformers.utils import logging as transformers_logging
 
 from .config import SummarizerConfig
 from .utils import (
-    split_text_into_chunks,
-    validate_text_input,
     estimate_summary_ratio,
     setup_logging,
+    split_text_into_chunks,
+    validate_text_input,
 )
 
 logger = logging.getLogger(__name__)
@@ -76,9 +76,9 @@ class TextSummarizer:
             # Get max token length
             self.max_tokens = self.tokenizer.model_max_length
             if self.max_tokens > 1_000_000:  # Some models return very large values
-                self.max_tokens = self.config.SUPPORTED_MODELS.get(
-                    self.config.model_name, {}
-                ).get("max_tokens", 512)
+                self.max_tokens = self.config.SUPPORTED_MODELS.get(self.config.model_name, {}).get(
+                    "max_tokens", 512
+                )
 
             logger.debug(f"Model max tokens: {self.max_tokens}")
 
@@ -98,8 +98,13 @@ class TextSummarizer:
             elif self.config.device.startswith("cuda"):
                 try:
                     import torch
+
                     if torch.cuda.is_available():
-                        device_id = int(self.config.device.split(":")[-1]) if ":" in self.config.device else 0
+                        device_id = (
+                            int(self.config.device.split(":")[-1])
+                            if ":" in self.config.device
+                            else 0
+                        )
                         return device_id
                 except (ImportError, ValueError):
                     logger.warning("CUDA requested but not available, using CPU")
@@ -109,6 +114,7 @@ class TextSummarizer:
             # Auto-detect
             try:
                 import torch
+
                 return 0 if torch.cuda.is_available() else -1
             except ImportError:
                 return -1
@@ -154,7 +160,9 @@ class TextSummarizer:
 
             # Estimate compression
             ratio, expected_len = estimate_summary_ratio(num_tokens, max_len, min_len)
-            logger.debug(f"Expected compression ratio: {ratio:.2f}x, target length: {expected_len} tokens")
+            logger.debug(
+                f"Expected compression ratio: {ratio:.2f}x, target length: {expected_len} tokens"
+            )
 
             # Determine chunk size
             max_chunk_size = self.config.max_chunk_size or (self.max_tokens - 100)

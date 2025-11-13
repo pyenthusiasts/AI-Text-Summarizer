@@ -5,7 +5,7 @@ This example demonstrates advanced features like custom configuration,
 different models, and batch processing.
 """
 
-from ai_text_summarizer import TextSummarizer, SummarizerConfig
+from ai_text_summarizer import SummarizerConfig, TextSummarizer
 
 
 def example_custom_config():

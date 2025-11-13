@@ -3,13 +3,13 @@ Command-line interface for AI Text Summarizer.
 """
 
 import argparse
-import sys
 import logging
+import sys
 from pathlib import Path
 from typing import Optional
 
-from .summarizer import TextSummarizer
 from .config import SummarizerConfig
+from .summarizer import TextSummarizer
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,11 @@
 """Tests for summarizer module."""
 
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from ai_text_summarizer.summarizer import TextSummarizer, summarize_text
+
 from ai_text_summarizer.config import SummarizerConfig
+from ai_text_summarizer.summarizer import TextSummarizer, summarize_text
 
 
 @pytest.fixture

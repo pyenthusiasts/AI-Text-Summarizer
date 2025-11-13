@@ -1,6 +1,7 @@
 """Pytest configuration and fixtures."""
 
 import pytest
+
 from ai_text_summarizer.config import SummarizerConfig
 
 

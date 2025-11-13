@@ -1,11 +1,13 @@
 """Tests for utility functions."""
 
-import pytest
 from unittest.mock import Mock
+
+import pytest
+
 from ai_text_summarizer.utils import (
+    estimate_summary_ratio,
     split_text_into_chunks,
     validate_text_input,
-    estimate_summary_ratio,
 )
 
 

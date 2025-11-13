@@ -4,6 +4,7 @@ Utility functions for AI Text Summarizer.
 
 import logging
 from typing import List, Tuple
+
 from transformers import PreTrainedTokenizer
 
 logger = logging.getLogger(__name__)
@@ -47,8 +48,7 @@ def split_text_into_chunks(
     """
     if max_chunk_size <= overlap:
         raise ValueError(
-            f"max_chunk_size ({max_chunk_size}) must be greater than "
-            f"overlap ({overlap})"
+            f"max_chunk_size ({max_chunk_size}) must be greater than " f"overlap ({overlap})"
         )
 
     # Tokenize the entire text

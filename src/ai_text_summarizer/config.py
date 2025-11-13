@@ -49,11 +49,7 @@ class SummarizerConfig:
             )
 
         if self.chunk_overlap < 0:
-            raise ValueError(
-                f"chunk_overlap must be non-negative, got {self.chunk_overlap}"
-            )
+            raise ValueError(f"chunk_overlap must be non-negative, got {self.chunk_overlap}")
 
         if self.temperature <= 0:
-            raise ValueError(
-                f"temperature must be positive, got {self.temperature}"
-            )
+            raise ValueError(f"temperature must be positive, got {self.temperature}")

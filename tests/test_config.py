@@ -1,6 +1,7 @@
 """Tests for configuration module."""
 
 import pytest
+
 from ai_text_summarizer.config import SummarizerConfig
 
 

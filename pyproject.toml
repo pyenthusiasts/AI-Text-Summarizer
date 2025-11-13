@@ -27,6 +27,29 @@ classifiers = [
 ]
 keywords = ["text", "summarization", "nlp", "transformers", "huggingface", "ai", "machine-learning"]
 requires-python = ">=3.8"
+dependencies = [
+    "transformers>=4.30.0",
+    "torch>=2.0.0",
+    "tokenizers>=0.13.0",
+    "sentencepiece>=0.1.99",
+    "protobuf>=3.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "black>=23.7.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.5.0",
+    "pylint>=2.17.0",
+    "ipython>=8.14.0",
+    "jupyter>=1.0.0",
+    "sphinx>=7.1.0",
+    "sphinx-rtd-theme>=1.3.0",
+]
 
 [project.scripts]
 ai-text-summarizer = "ai_text_summarizer.cli:main"
