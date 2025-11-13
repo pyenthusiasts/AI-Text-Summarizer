@@ -1,0 +1,8 @@
+# Core dependencies
+transformers>=4.30.0
+torch>=2.0.0
+tokenizers>=0.13.0
+
+# Optional but recommended
+sentencepiece>=0.1.99
+protobuf>=3.20.0
